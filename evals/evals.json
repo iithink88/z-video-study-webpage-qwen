@@ -1,0 +1,23 @@
+{
+  "skill_name": "z-video-study-webpage-qwen",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "把这个本地 MP4 完整学习一下，用 qwen3.7-plus 多模态生成图文并茂学习网页，关键知识点要匹配正确画面。",
+      "expected_output": "生成 study-summary-qwen.html、qwen-analysis.json、storyboard.json；每个关键知识点包含 frame_id 并配本地画面。",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "这个 YouTube 视频我已经下载好了，帮我理解视频内容，按现在的模板做学习网页，别只截关键片段，要全文学习。",
+      "expected_output": "先使用 transcript 或 Whisper 全量转录，再用 Qwen 分段分析并生成学习网页。",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "用 DashScope compatible-mode 的 Qwen 多模态模型看这个视频，输出关键知识点和对应截图。",
+      "expected_output": "使用 DASHSCOPE_API_KEY 环境变量，不泄露 key，生成知识点与截图绑定的 HTML。",
+      "files": []
+    }
+  ]
+}
