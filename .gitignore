@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Environment / secrets
+.env
+*.local
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+*.log
+
+# Local runtime data (not part of the skill)
+data/
+tmp/
+output/
+*.tmp
