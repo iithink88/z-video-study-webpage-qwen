@@ -34,13 +34,21 @@ DEFAULT_API_KEY_ENV = "DASHSCOPE_API_KEY"
 
 # Platform-aware default paths for ffmpeg/ffprobe
 if os.name == "nt":
-    _default_ffmpeg_candidates = [
-        Path("C:/Users/lenovo/bin/ffmpeg/ffmpeg-8.1.2-essentials_build/bin/ffmpeg.exe"),
-        Path("C:/Users/lenovo/bin/ffmpeg") / "ffmpeg-8.1.2-essentials_build" / "bin" / "ffmpeg.exe",
-    ]
-    _found_ffmpeg = next((p for p in _default_ffmpeg_candidates if p.exists()), None)
-    DEFAULT_FFMPEG = _found_ffmpeg or Path("ffmpeg.exe")
-    DEFAULT_FFPROBE = (_found_ffmpeg.parent / "ffprobe.exe") if _found_ffmpeg else Path("ffprobe.exe")
+    # Check PATH first, then common Windows install locations
+    import shutil as _shutil
+    _path_ffmpeg = _shutil.which("ffmpeg")
+    if _path_ffmpeg:
+        _found_ffmpeg = Path(_path_ffmpeg)
+    else:
+        _candidates = [
+            Path.home() / "bin" / "ffmpeg" / "ffmpeg-8.1.2-essentials_build" / "bin" / "ffmpeg.exe",
+            Path.home() / "bin" / "ffmpeg" / "ffmpeg-7.1-essentials_build" / "bin" / "ffmpeg.exe",
+            Path("C:/ffmpeg/bin/ffmpeg.exe"),
+            Path("C:/Program Files/ffmpeg/bin/ffmpeg.exe"),
+        ]
+        _found_ffmpeg = next((p for p in _candidates if p.exists()), None)
+    DEFAULT_FFMPEG = _found_ffmpeg or Path("ffmpeg")
+    DEFAULT_FFPROBE = (_found_ffmpeg.parent / "ffprobe") if _found_ffmpeg else Path("ffprobe")
 else:
     DEFAULT_FFMPEG = Path("/opt/homebrew/bin/ffmpeg")
     DEFAULT_FFPROBE = Path("/opt/homebrew/bin/ffprobe")
@@ -159,13 +167,16 @@ def extract_frames(
     frames: list[Frame] = []
     for index, timestamp in enumerate(timestamps, start=1):
         target = assets_dir / f"frame-{index:03d}.jpg"
+        # Fast seek: place -ss BEFORE -i so ffmpeg jumps to the keyframe
+        # instead of decoding from 0. For 10+ minute videos this is the
+        # difference between ~10s and ~0.5s per frame.
         cmd = [
             str(ffmpeg),
             "-y",
-            "-i",
-            str(video),
             "-ss",
             f"{timestamp:.3f}",
+            "-i",
+            str(video),
             "-frames:v",
             "1",
             "-pix_fmt",
