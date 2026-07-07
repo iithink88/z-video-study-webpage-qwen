@@ -20,7 +20,7 @@
 
 ## 前置依赖
 
-- **ffmpeg**：必需，用于抽帧与音频提取（Windows 下脚本会自动探测 `C:\Users\<你>\bin\ffmpeg\*\bin\ffmpeg.exe`，找不到则回退 `shutil.which("ffmpeg")`）
+- **ffmpeg**：必需，用于抽帧与音频提取（脚本会自动探测 PATH 及常见 Windows 安装位置，找不到则回退 `shutil.which("ffmpeg")`）
 - **DashScope API Key**：必需，用于调用 Qwen 多模态模型
   - 申请：https://dashscope.console.aliyun.com/ → API-KEY 管理
   - 运行前设置环境变量（**不要写进任何文件**）：
